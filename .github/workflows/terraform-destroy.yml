@@ -1,4 +1,4 @@
-name: 'Terraform Plan And Apply'
+name: 'Terraform Destroy'
 
 on:
   workflow_dispatch
