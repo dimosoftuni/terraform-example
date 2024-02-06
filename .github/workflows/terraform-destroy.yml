@@ -1,33 +1,28 @@
-name: 'Terraform Destroy'
+name: Terraform Azure Destruction
 
 on:
-  workflow_dispatch
-
-permissions:
-  contents: read
+  workflow_dispatch:
 
 jobs:
-  terraform-destroy:
-    name: 'Terraform Destroy'
+  terraform_destroy:
     runs-on: ubuntu-latest
-
     steps:
-    # Checkout the repository to the GitHub Actions runner
-    - name: Checkout
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    # Install the latest version of Terraform CLI and configure the Terraform CLI configuration file with a Terraform Cloud user API token
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v2
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: 1.0.0
 
-    - name: Login to Azure
-      uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
-    - name: Terraform Init
-      run: terraform init
+      - name: Configure Terraform Backend
+        run: |
+          terraform init -backend-config="resource_group_name=StorageRG" -backend-config="storage_account_name=taskboardstorage" -backend-config="container_name=taskboardcontainer" -backend-config="key=terraform.tfstate"
 
-    - name: Terraform Destroy
-      run: terraform destroy -auto-approve
+      - name: Terraform Destroy
+        run: terraform destroy -auto-approve
