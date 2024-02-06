@@ -1,8 +1,7 @@
 name: Terraform Azure Destruction
 
 on:
-  workflow_dispatch: # Manually triggered event
-  # You can add more events here if desired
+  workflow_dispatch:
 
 env:
   ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
