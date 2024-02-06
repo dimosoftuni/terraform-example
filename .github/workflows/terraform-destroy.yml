@@ -4,6 +4,12 @@ on:
   workflow_dispatch: # Manually triggered event
   # You can add more events here if desired
 
+env:
+  ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+  ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+  ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+  ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+
 jobs:
   terraform_destroy:
     runs-on: ubuntu-latest
@@ -19,11 +25,6 @@ jobs:
       - name: Configure Terraform Backend
         run: |
           terraform init -backend-config="resource_group_name=StorageRG" -backend-config="storage_account_name=taskboardstorage" -backend-config="container_name=taskboardcontainer" -backend-config="key=terraform.tfstate"
-
-      - name: Login to Azure using Service Principal
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_SERVICE_PRINCIPAL }}
 
       - name: Terraform Destroy
         run: terraform destroy -auto-approve
