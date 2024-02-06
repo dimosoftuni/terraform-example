@@ -6,12 +6,6 @@ on:
 permissions:
   contents: read
 
-env:
-  ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-  ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
-  ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-  ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-
 jobs:
   terraform-destroy:
     name: 'Terraform Destroy'
@@ -26,15 +20,14 @@ jobs:
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v2
 
+    - name: Login to Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
     # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
     - name: Terraform Init
       run: terraform init
 
-    - name: Download Terraform Plan
-      uses: actions/download-artifact@v2
-      with:
-        name: tfplan
-        path: .
-
     - name: Terraform Destroy
-      run: terraform destroy -auto-approve tfplan
+      run: terraform destroy -auto-approve
