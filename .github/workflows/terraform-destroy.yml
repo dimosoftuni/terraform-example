@@ -1,7 +1,8 @@
 name: Terraform Azure Destruction
 
 on:
-  workflow_dispatch:
+  workflow_dispatch: # Manually triggered event
+  # You can add more events here if desired
 
 jobs:
   terraform_destroy:
@@ -15,14 +16,14 @@ jobs:
         with:
           terraform_version: 1.0.0
 
-      - name: Login to Azure
-        uses: azure/login@v1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
       - name: Configure Terraform Backend
         run: |
           terraform init -backend-config="resource_group_name=StorageRG" -backend-config="storage_account_name=taskboardstorage" -backend-config="container_name=taskboardcontainer" -backend-config="key=terraform.tfstate"
+
+      - name: Login to Azure using Service Principal
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_SERVICE_PRINCIPAL }}
 
       - name: Terraform Destroy
         run: terraform destroy -auto-approve
